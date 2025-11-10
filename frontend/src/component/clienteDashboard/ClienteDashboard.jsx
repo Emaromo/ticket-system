@@ -1,26 +1,43 @@
-import React, { useEffect, useState } from "react";
-import Footer from "../Footer"; // ⚙️ Footer del sitio
-import api from "../../utils/axiosConfig"; // 📡 Axios con token configurado
-import { getUserEmail } from "../../utils/localStorage"; // 🔐 Extrae email desde token JWT
-import ClientCard from "../adminDashboard/ClientCard"; // 🧾 Tarjeta que muestra el nombre y logout
-import StateProgress from "./StateProgress"; // 🚦 Componente visual del estado del ticket
-import FAQSection from "./FAQSection"; // ❓ Preguntas frecuentes (nuevo componente)
-
 /**
- * 🎯 ClienteDashboard: panel del cliente autenticado
- * - Muestra los tickets asociados al email
- * - Integra barra de progreso visual
- * - Muestra preguntas frecuentes con animación
+ * =============================================================================
+ * CLIENTE DASHBOARD — ESTÉTICA TIPO LANDING (CLARA + AZUL)
+ * -----------------------------------------------------------------------------
+ * ✅ Qué se cambió (solo estilo, no lógica):
+ *   - Fondo claro (bg-gray-50) como tu landing.
+ *   - Tarjeta principal blanca con borde sutil y sombra (look profesional).
+ *   - Tipografía y espaciado más aireados (mejor legibilidad).
+ *   - Tabla con encabezado azul claro y filas alternadas.
+ *   - Componente StateProgress en look claro (coherente con landing).
+ *   - FAQ con tarjetas blancas/border gris (misma identidad visual).
+ *   - Totalmente responsive: stack en móvil, anchos fluidos, tabla scrollable.
+ *
+ * ⚠️ Importante: NO se tocó la lógica de datos, ni endpoints, ni props.
+ * =============================================================================
  */
+
+import React, { useEffect, useState } from "react";
+import Footer from "../Footer";                     // ⚙️ Footer del sitio (no se toca)
+import api from "../../utils/axiosConfig";         // 📡 Axios configurado (no se toca)
+import { getUserEmail } from "../../utils/localStorage"; // 🔐 Email desde JWT (no se toca)
+import ClientCard from "../adminDashboard/ClientCard";   // 🧾 Nombre + Logout (no se toca)
+import StateProgress from "./StateProgress";             // 🚦 Paso a paso (estilo solo)
+import FAQSection from "./FAQSection";                   // ❓ Preguntas frecuentes (estilo solo)
+
 export default function ClienteDashboard() {
-  const [tickets, setTickets] = useState([]);          // 📬 Lista de tickets del cliente
-  const [mensaje, setMensaje] = useState("");          // ⚠️ Mensaje en caso de error o sin tickets
-  const [loading, setLoading] = useState(true);        // ⏳ Estado de carga
+  // 📬 Estado con los tickets del cliente (NO SE TOCA)
+  const [tickets, setTickets] = useState([]);
+  // ⚠️ Mensaje informativo (NO SE TOCA)
+  const [mensaje, setMensaje] = useState("");
+  // ⏳ Loader (NO SE TOCA)
+  const [loading, setLoading] = useState(true);
+  // 🔑 Email del cliente desde el token (NO SE TOCA)
   const email = getUserEmail();
-  const [activado, setActivado] = useState(false);                        // 🔑 Email desde JWT
+  // 🔔 Estado compartido para notificaciones (NO SE TOCA)
+  const [activado, setActivado] = useState(false);
 
   /**
-   * 🔄 Al montar el componente, trae los tickets del cliente por su email
+   * 🔄 Al montar: trae tickets por email
+   * (LÓGICA ORIGINAL CONSERVADA)
    */
   useEffect(() => {
     const fetchTickets = async () => {
@@ -45,136 +62,183 @@ export default function ClienteDashboard() {
     fetchTickets();
   }, [email]);
 
+  /**
+   * 📅 Helper: formatea YYYY-MM-DD -> DD/MM/YYYY
+   * (LÓGICA ORIGINAL CONSERVADA)
+   */
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    try {
+      return new Date(dateStr + "T00:00:00").toLocaleDateString("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    } catch (e) {
+      return "—";
+    }
+  };
+
   return (
-    // 🖥️ Contenedor principal con fondo tecnológico
-    <div
-      className="min-h-screen flex flex-col bg-cover bg-center"
-      style={{ backgroundImage: `url('/fondo-tech3.jpg')` }}
-    >
-      {/* 🧾 Encabezado con nombre del cliente */}
-      <header className="w-full px-8 py-6">
+    /**
+     * 🎨 CONTENEDOR PRINCIPAL
+     * - Fondo claro general (bg-gray-50) como la landing.
+     * - Layout columna (header arriba, contenido al medio, footer abajo).
+     */
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* 🧾 Encabezado con ClientCard (mismo componente) */}
+      <header className="w-full px-6 md:px-12 py-6">
         <ClientCard email={email} />
       </header>
 
-      {/* 📦 Contenido central */}
-      <main className="flex-grow w-full px-8 flex items-center justify-center">
-        <div
-          className="w-full max-w-5xl  bg-black bg-opacity-90 rounded-xl p-6 shadow-md
-                    hover:shadow-[0_0_20px_rgba(0,102,255,0.4)] transition-shadow duration-300 overflow-auto"
-        >
-          {/* ⏳ Mensaje mientras se cargan los tickets */}
-          {loading ? (
-            <p className="text-blue-300 text-lg">⏳ Cargando tus tickets...</p>
-          ) : (
-            <>
-              {/* 🛑 Mostrar mensaje si no hay tickets o hay error */}
-              {mensaje && <p className="mb-4 text-gray-300 text-lg">{mensaje}</p>}
+      {/**
+       * 📦 CONTENIDO CENTRAL
+       * - Contenedor max-w-7xl como tu landing.
+       * - Tarjeta blanca principal: borde sutil + sombra suave.
+       * - padding fluido responsive (p-4 -> md:p-8).
+       */}
+      <main className="flex-grow w-full">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-12">
+          <div
+            className="
+              w-full bg-white rounded-2xl
+              border border-gray-200 shadow-md
+              p-4 sm:p-6 md:p-8
+            "
+          >
+            {/* ⏳ Estado de carga (estilo claro + azul suave) */}
+            {loading ? (
+              <p className="text-blue-600 text-base sm:text-lg animate-pulse">
+                ⏳ Cargando tus tickets...
+              </p>
+            ) : (
+              <>
+                {/* 🛑 Mensajes informativos (error / no hay tickets) */}
+                {mensaje && (
+                  <p
+                    className="
+                      mb-6 text-center text-gray-700
+                      bg-yellow-50 border border-yellow-200
+                      rounded-lg p-4
+                    "
+                  >
+                    {mensaje}
+                  </p>
+                )}
 
-              {/* 📋 Tabla si existen tickets */}
-              {tickets.length > 0 && (
-                <>
-                  {/* 🌐 Tabla con scroll y diseño oscuro */}
-                  <div className="overflow-x-auto custom-scrollbar max-h-[200px] rounded-md">
-                    <table className="min-w-full bg-zinc800 bg-opacity-10  text-white  rounded-md shadow">
-                      {/* 🔷 Encabezado con colores */}
-                      <thead>
-                        <tr className="bg-gradient-to-r from-zinc-900 to-blue-950 text-sm uppercase text-blue-200">
-                          <th className="py-3 px-6 text-left">ID</th>
-                          <th className="py-3 px-6 text-left">Descripción</th>
-                          <th className="py-3 px-6 text-left">Estado</th>
-                          <th className="py-3 px-6 text-left">Solución</th>
-                          <th className="py-3 px-6 text-left">Precio</th>
-                          <th className="py-3 px-6 text-left">Fecha</th>
-                        </tr>
-                      </thead>
+                {/* 📋 Tabla + Progreso + FAQ (solo si hay tickets) */}
+                {tickets.length > 0 && (
+                  <>
+                    {/**
+                     * 🌐 TABLA DE TICKETS
+                     * - Contenedor con overflow-x-auto para móvil.
+                     * - Altura máxima controlada si querés limitar (opcional).
+                     * - Estilo claro: encabezado azul, filas alternadas gris muy claro.
+                     */}
+                    <div className="overflow-x-auto rounded-xl border border-gray-200 mb-6">
+                      <table className="min-w-full table-auto text-sm">
+                        {/* 🔷 Encabezado (azul claro + texto blanco) */}
+                        <thead className="bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs uppercase tracking-wide">
+                          <tr>
+                            <th className="py-3 px-4 text-left">ID</th>
+                            <th className="py-3 px-4 text-left">Descripción</th>
+                            <th className="py-3 px-4 text-left">Estado</th>
+                            <th className="py-3 px-4 text-left">Solución</th>
+                            <th className="py-3 px-4 text-left">Precio</th>
+                            <th className="py-3 px-4 text-left">Fecha</th>
+                          </tr>
+                        </thead>
 
-                      {/* 📄 Cuerpo de la tabla */}
-                      <tbody>
-                        {tickets.map((ticket) => {
-                          let estadoColor = "text-white";
-                          const estado = ticket.estado?.toLowerCase();
+                        {/* 📄 Cuerpo de tabla (filas alternadas) */}
+                        <tbody className="divide-y divide-gray-100">
+                          {tickets.map((ticket, idx) => {
+                            // 🎨 Color por estado (MISMA LÓGICA, solo clases)
+                            let estadoColor = "text-gray-800";
+                            const estado = ticket.estado?.toLowerCase();
+                            if (estado === "pendiente") estadoColor = "text-yellow-600";
+                            else if (estado === "en reparación") estadoColor = "text-orange-600";
+                            else if (estado === "listo") estadoColor = "text-green-600";
 
-                          if (estado === "pendiente") {
-                            estadoColor = "text-yellow-400";
-                          } else if (estado === "en reparación") {
-                            estadoColor = "text-orange-400";
-                          } else if (estado === "listo") {
-                            estadoColor = "text-green-400";
-                          }
-
-                          return (
-                            <tr
-                              key={ticket.id}
-                              className=" hover:bg-zinc-800 transition"
+                            return (
+                              <tr
+                                key={ticket.id}
+                                className={`${
+                                  idx % 2 === 0 ? "bg-gray-50/80" : "bg-white"
+                                } hover:bg-blue-50 transition-colors`}
                               >
-                              <td className="py-3 px-6">{ticket.id}</td>
-                              <td className="py-3 px-6">{ticket.descripcionProblema}</td>
-                              <td className={`py-3 px-6 font-semibold ${estadoColor}`}>
-                                {ticket.estado}
-                              </td>
-                              <td className="py-3 px-6">{ticket.solucion || "-"}</td>
-                              <td className="py-3 px-6">
-                              <span className="text-green-400 font-semibold">$</span>
-                              <span className="text-white ml-1">{ticket.precio}</span>
-                              </td>
-                              <td className="py-3 px-6">
-                              {new Date(ticket.fechaCreacion + "T00:00:00").toLocaleDateString("es-AR", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                              })}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                                {/* ID */}
+                                <td className="py-3 px-4 align-top text-gray-700">
+                                  {ticket.id}
+                                </td>
 
-                  {/* 🚦 Progreso de estado visual del primer ticket */}
-                  <StateProgress
-                  estado={tickets[0].estado}
-                  ticketId={tickets[0].id}
-                  clienteEmail={email}
-                  activado={activado}
-                  setActivado={setActivado}
-                  fechas={{
-                  pendiente: tickets[0].fechaCreacion
-                  ? new Date(tickets[0].fechaCreacion+ "T00:00:00").toLocaleDateString("es-AR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  })
-                  : "—",
-                  "en reparación": tickets[0].fechaReparacion
-                  ? new Date(tickets[0].fechaReparacion + "T00:00:00").toLocaleDateString("es-AR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  })
-                  : "—",
-                  listo: tickets[0].fechaListo
-                  ? new Date(tickets[0].fechaListo + "T00:00:00").toLocaleDateString("es-AR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  })
-                : "—",
-                }}
-  
-/>
+                                {/* Descripción */}
+                                <td className="py-3 px-4 align-top text-gray-800">
+                                  {ticket.descripcionProblema}
+                                </td>
 
+                                {/* Estado con color */}
+                                <td className={`py-3 px-4 align-top font-semibold ${estadoColor}`}>
+                                  {ticket.estado}
+                                </td>
 
-                  {/* ❓ Sección de preguntas frecuentes con animación */}
-                  <FAQSection />
-                </>
-              )}
-            </>
-          )}
+                                {/* Solución */}
+                                <td className="py-3 px-4 align-top text-gray-700">
+                                  {ticket.solucion || "-"}
+                                </td>
+
+                                {/* Precio */}
+                                <td className="py-3 px-4 align-top">
+                                  <span className="text-green-600 font-semibold mr-1">$</span>
+                                  <span className="text-gray-900">{ticket.precio}</span>
+                                </td>
+
+                                {/* Fecha */}
+                                <td className="py-3 px-4 align-top text-gray-700">
+                                  {formatDate(ticket.fechaCreacion)}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/**
+                     * 🚦 STATE PROGRESS (paso a paso)
+                     * - Se mantiene la funcionalidad y props.
+                     * - Look claro alineado con la landing (ver componente abajo).
+                     */}
+                    <div className="mb-6">
+                      <StateProgress
+                        estado={tickets[0].estado}
+                        ticketId={tickets[0].id}
+                        clienteEmail={email}
+                        activado={activado}
+                        setActivado={setActivado}
+                        fechas={{
+                          pendiente: tickets[0].fechaCreacion
+                            ? formatDate(tickets[0].fechaCreacion)
+                            : "—",
+                          "en reparación": tickets[0].fechaReparacion
+                            ? formatDate(tickets[0].fechaReparacion)
+                            : "—",
+                          listo: tickets[0].fechaListo ? formatDate(tickets[0].fechaListo) : "—",
+                        }}
+                      />
+                    </div>
+
+                    {/* ❓ FAQ (estilo claro + tarjetas) */}
+                    <FAQSection />
+                  </>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </main>
 
-      {/* ⚙️ Footer fijo del sitio */}
+      {/* ⚙️ Footer del sitio (no se toca) */}
       <Footer />
     </div>
-  );}
+  );
+}

@@ -1,0 +1,3 @@
+echo target/ > .gitignore
+echo frontend/ >> .gitignore
+echo node_modules/ >> .gitignore

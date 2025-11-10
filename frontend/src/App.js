@@ -6,6 +6,7 @@ import AdminDashboard from "./component/adminDashboard/AdminDashboard";
 import ClienteDashboard from "./component/clienteDashboard/ClienteDashboard";
 import LoginSignupPage from "./pages/LoginSignupPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import LandingPage from "./pages/LandingPage";
 
 /**
  * Como <BrowserRouter> ya está en index.js, acá solo usamos <Routes> y <Route>
@@ -13,6 +14,10 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 function App() {
   return (
     <Routes>
+       
+      {/* Landing page (inicio) */}
+      <Route path="/" element={<LandingPage />} />
+
       {/* Página de login y registro */}
       <Route path="/login" element={<LoginSignupPage />} />
 

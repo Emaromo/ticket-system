@@ -1,19 +1,12 @@
-// Importamos los íconos necesarios desde lucide-react
+// 📦 Importamos íconos desde lucide-react
 import { UserCog, LogOut } from "lucide-react";
-
-// Importamos React y hooks necesarios
 import React, { useState, useEffect } from "react";
-
-// Importamos la función de logout que limpia el localStorage y redirige
 import { logout } from "../../utils/auth";
-
-// Axios personalizado para enviar peticiones con el token JWT
 import api from "../../utils/axiosConfig";
+import { motion } from "framer-motion";
 
 /**
- * 🧠 Función utilitaria para poner la primera letra en mayúscula
- * y el resto en minúscula.
- * Ej: "emanuel" -> "Emanuel"
+ * 🧠 Capitaliza nombres (primera letra mayúscula)
  */
 const capitalize = (str) => {
   if (!str) return "";
@@ -21,83 +14,95 @@ const capitalize = (str) => {
 };
 
 /**
- * 💼 Componente que muestra una tarjeta con:
- * - Un mensaje de bienvenida personalizado usando nombre y apellido.
- * - Un botón para cerrar sesión.
- * 
- * Recibe como prop el `email` que se usa para buscar los datos del usuario en el backend.
+ * 💼 TechnicalCard — Estilo azul/celeste fuerte con gradientes
+ * ⚙️ Lógica sin cambios. Solo mejora visual (100% segura)
+ * 🎨 Estilo:
+ * - Fondo degradado azul oscuro → celeste brillante.
+ * - Bordes redondeados 2xl, sombras suaves con luz azul.
+ * - Botón redondeado tipo "pill" con gradiente y hover dinámico.
+ * - 100% responsive (móvil → desktop).
  */
 export default function TechnicalCard({ email }) {
-  // 🎯 Estado para guardar el nombre y apellido del usuario (desde backend)
   const [userName, setUserName] = useState({ firstName: "", lastName: "" });
-
-  // ⚠️ Estado para capturar errores al hacer la petición
   const [error, setError] = useState(null);
 
-  /**
-   * 🧩 useEffect que se ejecuta al cargar el componente o si cambia el email.
-   * Hace una petición al backend para traer los datos del usuario por email.
-   */
   useEffect(() => {
-    if (!email) return; // Si no tenemos email, salimos sin hacer nada.
-
+    if (!email) return;
     const fetchUserData = async () => {
       try {
-        // 🔎 GET a backend: trae el usuario por email
         const response = await api.get(`/users/email/${email}`);
-
-        // ✅ Si fue exitoso, extraemos el nombre y apellido y lo guardamos en el estado
         if (response.status === 200) {
           const { firstName, lastName } = response.data;
-
-          // Guardamos en estado aplicando formato capitalizado
           setUserName({
             firstName: capitalize(firstName),
             lastName: capitalize(lastName),
           });
-
-          setError(null); // Limpiamos error
+          setError(null);
         }
       } catch (err) {
-        // ❌ Si falla la petición, mostramos error y vaciamos los datos
         console.error(err);
         setError("No se pudo cargar el nombre del usuario.");
         setUserName({ firstName: "", lastName: "" });
       }
     };
-
-    fetchUserData(); // Ejecutamos la función async
-  }, [email]); // Dependencia: se vuelve a ejecutar si cambia el email
+    fetchUserData();
+  }, [email]);
 
   return (
-    <div className="w-full bg-black border-2 border-blue-700 rounded-lg px-6 py-4 flex items-center justify-between transition duration-300 hover:shadow-[0_0_10px_rgba(59,130,246,0.9)]">
-      
-      {/* 📌 Sección izquierda: icono + mensaje de bienvenida */}
+    // 🧱 CONTENEDOR PRINCIPAL — gradiente azul profundo → celeste
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      whileHover={{
+        scale: 1.02,
+        boxShadow: "0 0 35px rgba(56,189,248,0.5)", // 💎 Luz celeste sutil
+      }}
+      className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-5 
+                 rounded-2xl bg-gradient-to-br from-[#0a1a3d] via-[#004aad] to-[#38bdf8]
+                 border border-blue-500/50 shadow-[0_0_25px_rgba(56,189,248,0.25)]
+                 backdrop-blur-md transition-all duration-500"
+    >
+      {/* 👤 IZQUIERDA: Ícono + saludo */}
       <div className="flex items-center gap-3">
-        {/* Icono de usuario */}
-        <div className="p-2 bg-zinc-800 rounded-full">
-          <UserCog className="w-6 h-6 text-blue-400" />
-        </div>
+        {/* 🔹 Ícono circular con glow */}
+        <motion.div
+          whileHover={{ rotate: 10, scale: 1.1 }}
+          className="p-2 bg-gradient-to-br from-blue-700 via-sky-500 to-cyan-400 rounded-full 
+                     shadow-[0_0_5px_rgba(56,189,248,0.6)]"
+        >
+          <UserCog className="w-6 h-6 text-white drop-shadow-[0_0_6px_#38bdf8]" />
+        </motion.div>
 
-        {/* Texto de bienvenida dinámico */}
-        <h2 className="text-white text-lg font-bold">
-          {/* 🔄 Mostramos mensaje según estado */}
+        {/* 🔹 Texto dinámico */}
+        <h2 className="text-white text-lg sm:text-xl font-semibold tracking-wide drop-shadow-[0_0_10px_rgba(56,189,248,0.3)]">
           {error
             ? "Bienvenido.."
             : userName.firstName && userName.lastName
-            ? `Bienvenido ${userName.firstName} ${userName.lastName}...`
+            ? `Bienvenido ${userName.firstName} ${userName.lastName} 👋`
             : "Bienvenido.."}
         </h2>
       </div>
 
-      {/* 📌 Sección derecha: botón de cerrar sesión */}
-      <button
+      {/* 🔘 BOTÓN CERRAR SESIÓN */}
+      <motion.button
         onClick={logout}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-700 to-black text-white font-medium text-sm shadow-md hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300"
+        whileHover={{
+          scale: 1.05,
+          boxShadow: "0 0 10px rgba(0, 0, 0, 0.7)", // ✨ Glow azul-celeste
+        }}
+        whileTap={{ scale: 0.95 }}
+        className="flex items-center justify-center gap-2 px-7 py-2.5 rounded-full
+                   text-white font-medium text-sm sm:text-base
+                   bg-gradient-to-r from-[#3b82f6] via-[#06b6d4] to-[#0284c7]
+                   shadow-[0_0_18px_rgba(56,189,248,0.4)]
+                   border border-sky-400/30
+                   hover:from-[#06b6d4] hover:via-[#3b82f6] hover:to-[#1e40af]
+                   transition-all duration-400"
       >
-        <LogOut className="w-4 h-4" />
+        <LogOut className="w-4 h-4 text-white drop-shadow-[0_0_8px_#38bdf8]" />
         Cerrar sesión
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }

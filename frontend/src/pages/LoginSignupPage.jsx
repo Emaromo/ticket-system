@@ -1,20 +1,16 @@
-// Página de login y registro con fondo futurista, título animado y alternancia visual entre ambos formularios.
-
+// LoginSignupPage mejorado con animaciones futuristas
 import React, { useState } from "react";
-import Login from "../component/login/Login";       // Componente de login
-import Signup from "../component/signup/Signup";   // Componente de registro
-import { useNavigate } from "react-router-dom";    // Hook para navegación
-import { getUserRole } from "../utils/auth";       // Función para obtener rol desde el token
+import Login from "../component/login/Login";
+import Signup from "../component/signup/Signup";
+import { useNavigate } from "react-router-dom";
+import { getUserRole } from "../utils/auth";
 import Footer from "../component/Footer";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function LoginSignupPage() {
-  const [showLogin, setShowLogin] = useState(true);  // Estado para mostrar Login o Registro
-  const navigate = useNavigate();                    // Permite redirigir según el rol
+  const [showLogin, setShowLogin] = useState(true);
+  const navigate = useNavigate();
 
-  /**
-   * Función que se ejecuta después de un login exitoso
-   * Redirige al dashboard según el rol del usuario
-   */
   const handleLoginSuccess = () => {
     const role = getUserRole();
     if (role === "ROLE_ADMIN") navigate("/admin");
@@ -22,68 +18,92 @@ export default function LoginSignupPage() {
   };
 
   return (
-    // Contenedor principal que ocupa toda la pantalla (alto mínimo 100vh)
-    // Flex columna para ordenar main y footer verticalmente
-    // Sin justify-between para que no se estiren hacia extremos
     <div
-      className="min-h-screen flex flex-col bg-cover bg-center"
+      className="min-h-screen flex flex-col bg-cover bg-center relative"
       style={{ backgroundImage: `url('/fondo-tech4.jpg')` }}
     >
-      {/*
-        Main ocupa todo el espacio entre header y footer gracias a flex-grow
-        Es flex para centrar contenido vertical y horizontalmente
-      */}
-      <main className="flex-grow flex justify-center items-center h-full">
-        {/*
-          Contenedor interno:
-          - Ocupa toda la altura de main (h-full)
-          - Flex columna, contenido centrado vertical y horizontalmente
-          - Ancho máximo definido para que no se estire demasiado
-          - Fondo negro semi-transparente
-          - Padding y sombra
-        */}
-        <div className="bg-black bg-opacity-60 w-full max-w-md h-full flex flex-col justify-start items-center p-6 rounded-none shadow-lg">
-          <h1 className="text-white text-3xl font-bold text-center mb-1">UNITY TECH</h1>
-          <p className="text-gray-400 text-center text-sm mb-6">COMPUTERS SERVICE</p>
+      {/* Overlay futurista */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/90 z-0" />
 
+      {/* MAIN */}
+      <main className="flex-grow flex justify-center items-center h-full relative z-10 px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="bg-black/80 backdrop-blur-lg w-full max-w-md p-8 rounded-2xl shadow-2xl border border-blue-500/20"
+        >
+          {/* Branding */}
+          <div className="flex items-center gap-3 mb-2 justify-center">
+            <img
+              src="/logo192.png"
+              alt="Logo"
+              className="w-10 h-10 object-contain drop-shadow-lg"
+            />
+            <h1 className="text-white text-3xl md:text-4xl font-extrabold tracking-wider drop-shadow-lg">
+              Comunity Tech
+            </h1>
+          </div>
+          <p className="text-blue-300 text-center text-xs md:text-sm mb-8 tracking-[0.2em] uppercase">
+            Computers Service
+          </p>
+
+          {/* Botones de alternancia */}
           <div className="flex gap-4 mb-6 w-full">
             <button
               onClick={() => setShowLogin(true)}
-              className={`px-6 py-2 rounded font-semibold transition-all w-1/2 text-white duration-300 ${
+              className={`px-6 py-2 rounded-md font-semibold w-1/2 transition-all duration-300 ${
                 showLogin
-                  ? "bg-gradient-to-r from-blue-700 to-black shadow-lg shadow-blue-500/40"
-                  : "bg-zinc-950 bg-opacity-190 hover:bg-zinc-900 text-black-400"
+                  ? "bg-gradient-to-r from-blue-600 to-blue-900 text-white shadow-[0_0_15px_rgba(0,153,255,0.7)]"
+                  : "bg-zinc-900 text-gray-400 hover:text-white hover:bg-zinc-800"
               }`}
             >
               Login
             </button>
             <button
               onClick={() => setShowLogin(false)}
-              className={`px-6 py-2 rounded font-semibold transition-all w-1/2 text-white duration-300 ${
+              className={`px-6 py-2 rounded-md font-semibold w-1/2 transition-all duration-300 ${
                 !showLogin
-                  ? "bg-gradient-to-r from-blue-700 to-black shadow-lg shadow-blue-500/40"
-                  : "bg-zinc-950 bg-opacity-190 hover:bg-zinc-900 text-gray-400"
+                  ? "bg-gradient-to-r from-blue-600 to-blue-900 text-white shadow-[0_0_15px_rgba(0,153,255,0.7)]"
+                  : "bg-zinc-900 text-gray-400 hover:text-white hover:bg-zinc-800"
               }`}
             >
               Signup
             </button>
           </div>
 
-          {/* 
-            Se muestra el componente Login o Signup según el estado.
-            Si es Login, le pasamos la función handleLoginSuccess como prop para que se ejecute desde adentro cuando sea exitoso.
-          */}
-          <div className="w-full">
-            {showLogin ? (
-              <Login onLoginSuccess={handleLoginSuccess} />
-            ) : (
-              <Signup />
-            )}
+          {/* Formularios con animación */}
+          <div className="w-full min-h-[300px]">
+            <AnimatePresence mode="wait">
+              {showLogin ? (
+                <motion.div
+                  key="login"
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ duration: 0.4 }}
+                  className="w-full"
+                >
+                  <Login onLoginSuccess={handleLoginSuccess} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="signup"
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.4 }}
+                  className="w-full"
+                >
+                  <Signup />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
       </main>
 
-      {/* Footer pegado abajo */}
+      {/* Footer */}
       <Footer />
     </div>
   );
